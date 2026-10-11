@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="ZScriv — escritorio de escritura narrativa para novelistas / narrative writing desk for novelists">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%8D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<script>try{var _i=localStorage.getItem("zscriv_idioma")||"auto",_L=(_i==="es"||_i==="en")?_i:(/^en/i.test(navigator.language||"")?"en":"es");document.documentElement.lang=_L;if(_L==="en"){document.documentElement.classList.add("i18n-pendiente");setTimeout(function(){document.documentElement.classList.remove("i18n-pendiente")},2500);}}catch(e){}</script>
+<script>try{var _p=localStorage.getItem("zscriv_modo_ui")||"auto",_l=Math.min(screen.width,screen.height),_t=(matchMedia("(pointer:coarse)").matches||navigator.maxTouchPoints>0);if(_p==="movil"||(_p==="auto"&&((_t&&_l<=820)||innerWidth<=700)))document.documentElement.classList.add("movil");}catch(e){}</script>
+<title>ZScriv — Sistema Operativo Narrativo</title>
+<meta name="theme-color" content="#050b16">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZScriv">
+<meta name="description" content="ZScriv — Sistema Operativo Narrativo, tu escritorio de escritura offline.">
+<link rel="stylesheet" href="ZScriv.css?v=3">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <button class="btn-icono" id="btn-menu-movil" title="Menú">☰</button>
+    <div id="logo"><span class="pt"></span>ZScriv</div>
+    <input id="proyecto-nombre" value="Proyecto sin título">
+    <div class="modos-vista">
+      <button data-vista="editor" class="activo">✎ Editor</button>
+      <button data-vista="corkboard">▤ Corcho</button>
+      <button data-vista="outliner">☰ Esquema</button>
+      <button data-vista="mundo">🌐 Mundo</button>
+      <button data-vista="mapa">✺ Mapa</button>
+      <button data-vista="linea">🕒 Línea</button>
+      <button data-vista="stats">📈 Progreso</button>
+    </div>
+    <div id="topbar-acciones">
+      <button class="btn-icono" id="btn-buscar-global" title="Buscar en todo (Ctrl+K)">🔍</button>
+      <button class="btn-icono" id="btn-guia" title="Guía de uso">❓</button>
+      <button class="btn-icono" id="btn-inspector-movil" title="Panel de detalles">ℹ️</button>
+      <button class="btn-icono" id="btn-proyectos" title="Tus proyectos">📂</button>
+      <button class="btn-icono" id="btn-ia" title="Asistente narrativo">✨</button>
+      <button class="btn-icono" id="btn-zen" title="Modo composición">⛶</button>
+      <button class="btn-icono" id="btn-temas" title="Preferencias visuales">🎨</button>
+      <button class="btn-icono" id="btn-export" title="Compilar / Exportar">⇩</button>
+      <button class="btn-icono" id="btn-guardar" title="Guardar (Ctrl+S)">💾</button>
+      <button class="btn-icono" id="btn-ajustes" title="Ajustes">⚙️</button>
+    </div>
+  </div>
+  <div class="fondo-movil" id="fondo-movil"></div>
+
+  <div id="cuerpo">
+    <div id="nav">
+      <button class="nav-btn activo" data-panel="manuscrito" title="Manuscrito">📖<span class="etiqueta">Manuscrito</span></button>
+      <button class="nav-btn" data-panel="personajes" title="Personajes">🧑<span class="etiqueta">Personajes</span></button>
+      <button class="nav-btn" data-panel="lugares" title="Lugares">📍<span class="etiqueta">Lugares</span></button>
+      <button class="nav-btn" data-panel="investigacion" title="Investigación">🗂<span class="etiqueta">Investigación</span></button>
+      <button class="nav-btn" data-panel="papelera" title="Papelera">🗑<span class="etiqueta">Papelera</span></button>
+    </div>
+
+    <div id="panel-lateral">
+      <div class="panel-cab">
+        <h3 id="panel-lateral-titulo">Manuscrito</h3>
+        <button class="btn-icono" style="width:24px;height:24px;font-size:13px" id="btn-nuevo-nodo" title="Nuevo">＋</button>
+      </div>
+      <div id="buscador-global"><span class="icono">🔎</span><input id="input-buscar" placeholder="Buscar en el manuscrito…"></div>
+      <div id="arbol"></div>
+      <div class="panel-pie">
+        <button id="btn-import">Importar JSON</button>
+        <button id="btn-export-json">Exportar JSON</button>
+      </div>
+    </div>
+
+    <div id="centro">
+      <div id="vista-editor" class="activa">
+        <div id="editor-cab"><input id="editor-titulo" placeholder="Título de la escena…"></div>
+        <div id="editor-hint">Menciona: <b>@</b>personaje · <b>#</b>lugar · <b>*</b>objeto (ej. *arma) · <b>%</b>criatura · <b>&amp;</b>raza. <b>Ctrl+K</b> para buscar en todo el proyecto.</div>
+        <div id="editor-envoltura">
+          <div id="editor-texto" class="editor-ce" contenteditable="true" data-placeholder="Había una vez…" spellcheck="true" autocapitalize="sentences" enterkeyhint="enter"></div>
+        </div>
+        <div id="barra-escritura" role="toolbar" aria-label="Herramientas de escritura">
+          <button class="be-btn be-pj" data-ins="@" title="Mencionar personaje">@</button>
+          <button class="be-btn be-lg" data-ins="#" title="Mencionar lugar">#</button>
+          <button class="be-btn be-ob" data-ins="*" title="Mencionar objeto">*</button>
+          <button class="be-btn be-cr" data-ins="%" title="Mencionar criatura">%</button>
+          <button class="be-btn be-rz" data-ins="&amp;" title="Mencionar raza">&amp;</button>
+          <span class="sep-be sep-menc"></span>
+          <button class="be-btn" id="be-deshacer" title="Deshacer">↶</button>
+          <button class="be-btn" id="be-rehacer" title="Rehacer">↷</button>
+          <span class="sep-be"></span>
+          <button class="be-btn be-ayuda" id="be-ajustes" title="Letra y colores">Aa</button>
+          <button class="be-btn" id="be-ocultar" title="Ocultar teclado">⌄</button>
+        </div>
+      </div>
+
+      <div id="vista-corkboard"><div class="cork-grid" id="cork-grid"></div></div>
+
+      <div id="vista-outliner">
+        <table class="outliner">
+          <thead><tr><th style="width:34px">#</th><th>Título</th><th>Sinopsis</th><th style="width:90px">Estado</th><th style="width:90px">Etiqueta</th><th style="width:70px">Palabras</th></tr></thead>
+          <tbody id="outliner-body"></tbody>
+        </table>
+      </div>
+
+      <div id="vista-mundo">
+        <div class="mundo-cabecera">
+          <div class="mundo-cats" id="mundo-cats"></div>
+          <button class="btn btn-secundario" id="btn-nueva-otro">＋ Nueva ficha</button>
+        </div>
+        <div class="mundo-grid" id="mundo-grid"></div>
+      </div>
+
+      <div id="vista-mapa">
+        <div class="mapa-modos" id="mapa-modos">
+          <button data-modo="todos" class="activo">Todos</button>
+          <button data-modo="personajes">🧬 Genealogía</button>
+          <button data-modo="lugares">📍 Lugares</button>
+          <button data-modo="objetos">🗡️ Objetos</button>
+          <button data-modo="criaturas">🐉 Criaturas</button>
+        </div>
+        <div class="mapa-zoom-ctrl">
+          <button class="btn-icono" id="btn-mapa-menos" title="Alejar">－</button>
+          <button class="btn-icono" id="btn-mapa-ajustar" title="Ajustar a la pantalla">◱</button>
+          <button class="btn-icono" id="btn-mapa-mas" title="Acercar">＋</button>
+          <button class="btn-icono" id="btn-mapa-reset" title="Reiniciar vista">⌂</button>
+          <button class="btn-icono activo" id="btn-mapa-puentes" title="Puentes en cruces de líneas">🌉</button>
+          <button class="btn-icono oculto" id="btn-mapa-deshacer" title="Deshacer último movimiento">↩️</button>
+        </div>
+        <button class="mapa-vincular-btn" id="btn-modo-vincular">🔗 Vincular</button>
+        <div id="mapa-canvas"><div id="mapa-transform"><svg id="mapa-svg"></svg></div></div>
+      </div>
+
+      <div id="vista-linea">
+        <div class="linea-cabecera">
+          <h3>Línea de tiempo del mundo</h3>
+          <button class="btn btn-secundario" id="btn-nuevo-evento">＋ Nuevo evento</button>
+        </div>
+        <div id="linea-lista"></div>
+      </div>
+
+      <div id="vista-stats">
+        <div class="stats-grid" id="stats-grid"></div>
+        <h3 style="font-size:12px;color:var(--texto-tenue);margin:6px 0 8px;text-transform:uppercase;letter-spacing:.05em">Racha de escritura (últimos 30 días)</h3>
+        <div id="heatmap"></div>
+        <h3 style="font-size:12px;color:var(--texto-tenue);margin:22px 0 8px;text-transform:uppercase;letter-spacing:.05em">Apariciones de personajes</h3>
+        <div id="apar-stats"></div>
+      </div>
+    </div>
+
+    <div id="inspector">
+      <div class="insp-tabs">
+        <button class="insp-tab activo" data-tab="sinopsis">Sinopsis</button>
+        <button class="insp-tab" data-tab="notas">Notas</button>
+        <button class="insp-tab" data-tab="meta">Meta</button>
+        <button class="insp-tab" data-tab="historial">Histor.</button>
+      </div>
+      <div class="insp-body">
+        <div class="insp-panel activo" data-tab="sinopsis">
+          <div class="campo"><label>Sinopsis breve</label><textarea id="insp-sinopsis" placeholder="Resumen de una o dos frases…"></textarea></div>
+          <div class="campo"><label>Estado</label><select id="insp-estado"><option>Sin empezar</option><option>Borrador</option><option>En revisión</option><option>Terminado</option></select></div>
+          <div class="campo"><label>Etiqueta de color</label><div class="selector-color" id="selector-etiqueta"></div></div>
+        </div>
+        <div class="insp-panel" data-tab="notas">
+          <div class="campo"><label>Notas del documento</label><textarea id="insp-notas" style="min-height:220px" placeholder="Anotaciones libres…"></textarea></div>
+        </div>
+        <div class="insp-panel" data-tab="meta">
+          <div class="campo"><label>Palabras clave (separadas por coma)</label><input id="insp-keywords"></div>
+          <div class="campo"><label>Objetivo de palabras (esta escena)</label><input id="insp-objetivo" type="number" min="0" placeholder="0 = sin objetivo"></div>
+          <div class="campo"><label>Palabras actuales</label><div id="insp-palabras" style="font-size:22px;font-weight:700;color:var(--acento-tinta)">0</div></div>
+        </div>
+        <div class="insp-panel" data-tab="historial">
+          <button class="btn btn-secundario" style="width:100%;margin-bottom:10px" id="btn-snapshot">📸 Crear instantánea</button>
+          <div id="lista-snapshots"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="barainf">
+    <span id="bi-palabras-doc">0 palabras (documento)</span>
+    <div class="sep"></div>
+    <span id="bi-palabras-total">0 palabras (proyecto)</span>
+    <div class="sep"></div>
+    <span id="bi-objetivo-txt" style="cursor:pointer;text-decoration:underline dotted;" title="Pulsa para cambiar tu meta diaria de palabras">Sin objetivo diario</span>
+    <div id="progreso-mini"><div id="progreso-mini-fill"></div></div>
+    <div class="sep"></div>
+    <span id="bi-racha">🔥 Racha: 0 días</span>
+    <span style="margin-left:auto;color:var(--texto-muy-tenue)" id="bi-guardado">Guardado localmente</span>
+  </div>
+  <nav id="navmovil" aria-label="Vistas">
+    <button data-ir="editor" class="activo"><span class="ic">✎</span>Editor</button>
+    <button data-ir="corkboard"><span class="ic">▤</span>Corcho</button>
+    <button data-ir="mundo"><span class="ic">🌐</span>Mundo</button>
+    <button data-ir="mapa"><span class="ic">✺</span>Mapa</button>
+    <button id="btn-mas-nav"><span class="ic">⋯</span>Más</button>
+  </nav>
+</div>
+
+<div id="hoja-mas">
+  <div class="hoja">
+    <div class="hoja-asa"></div>
+    <div class="hoja-grupo">Otras vistas</div>
+    <div class="hoja-grid">
+      <button data-ir="outliner"><span class="ic">☰</span>Esquema</button>
+      <button data-ir="linea"><span class="ic">🕒</span>Línea</button>
+      <button data-ir="stats"><span class="ic">📈</span>Progreso</button>
+    </div>
+    <div class="hoja-grupo">Herramientas</div>
+    <div class="hoja-grid">
+      <button data-btn="btn-proyectos"><span class="ic">📂</span>Proyectos</button>
+      <button data-btn="btn-ia"><span class="ic">✨</span>Asistente</button>
+      <button data-btn="btn-zen"><span class="ic">⛶</span>Composición</button>
+      <button data-btn="btn-temas"><span class="ic">🎨</span>Preferencias</button>
+      <button data-btn="btn-export"><span class="ic">⇩</span>Exportar</button>
+      <button data-btn="btn-guardar"><span class="ic">💾</span>Guardar</button>
+      <button data-btn="btn-guia"><span class="ic">❓</span>Guía</button>
+    </div>
+  </div>
+</div>
+
+<button class="zen-salir btn-icono oculto" id="btn-zen-salir" style="background:var(--bg-elemento)">✕ Salir del modo composición</button>
+<div id="toast"></div>
+<div id="mencion-autocomplete"></div>
+<div id="mencion-popup"></div>
+
+<!-- Proyectos -->
+<div class="overlay" id="modal-proyectos">
+  <div class="modal">
+    <div class="modal-cab"><h3>📂 Tus proyectos</h3><button class="btn-icono" id="modal-proyectos-x" data-cerrar>✕</button></div>
+    <div class="modal-body">
+      <button class="btn btn-primario" id="btn-nuevo-proyecto" style="width:100%;margin-bottom:14px">＋ Nuevo proyecto</button>
+      <div id="lista-proyectos"></div>
+      <button class="btn btn-secundario" id="btn-cerrar-proyecto-actual" style="width:100%;margin-top:14px">Cerrar proyecto actual (sin eliminar)</button>
+      <button class="btn btn-secundario" id="btn-ver-copias" style="width:100%;margin-top:10px">🕘 Copias automáticas…</button>
+      <p id="almacenamiento-uso" style="font-size:11px;color:var(--texto-tenue);margin-top:12px;line-height:1.5"></p>
+      <div class="carpeta-respaldo-box">
+        <div class="carpeta-respaldo-titulo">💾 Copia de seguridad automática en carpeta</div>
+        <p id="carpeta-respaldo-estado" style="font-size:11.5px;color:var(--texto-secundario);line-height:1.5;margin-bottom:8px"></p>
+        <button class="btn btn-secundario" id="btn-config-carpeta-respaldo" style="width:100%">📁 Elegir carpeta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Nuevo nodo del manuscrito -->
+<div class="overlay" id="modal-nuevo">
+  <div class="modal">
+    <div class="modal-cab"><h3>Nuevo elemento</h3><button class="btn-icono" data-cerrar>✕</button></div>
+    <div class="modal-body">
+      <div class="campo"><label>Tipo</label>
+        <select id="nuevo-tipo">
+          <option value="parte">Parte</option>
+          <option value="capitulo" selected>Capítulo</option>
+          <option value="escena">Escena</option>
+        </select>
+      </div>
+      <div class="campo"><label>Título</label><input id="nuevo-titulo" placeholder="Ej: Capítulo 1 — El comienzo"></div>
+    </div>
+    <div class="modal-pie"><button class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" id="btn-crear-nodo">Crear</button></div>
+  </div>
+</div>
+
+<!-- Ficha de personaje -->
+<div class="overlay" id="modal-personaje">
+  <div class="modal" style="width:680px">
+    <div class="modal-cab"><h3 id="pj-modal-titulo">Nuevo personaje</h3><button class="btn-icono" data-cerrar>✕</button></div>
+    <div class="modal-body">
+      <div class="campo oculto" id="pj-arquetipos-wrap">
+        <label>Arquetipo inicial (opcional — precarga rasgos, mentira, herida, defecto trágico, miedo profundo, arco y habilidades típicas)</label>
+        <div class="arquetipos-grid" id="pj-arquetipos-grid"></div>
+      </div>
+
+      <div class="pj-tabs">
+        <button class="pj-tab activo" data-tab="identidad">Identidad</button>
+        <button class="pj-tab" data-tab="personalidad">Personalidad</button>
+        <button class="pj-tab" data-tab="nucleo">Núcleo psicológico</button>
+        <button class="pj-tab" data-tab="arco">Arco</button>
+        <button class="pj-tab" data-tab="habilidades">Habilidades y secretos</button>
+        <button class="pj-tab" data-tab="presencia">Voz y presencia</button>
+        <button class="pj-tab" data-tab="creencias">Creencias y conexiones</button>
+      </div>
+
+      <div class="pj-panel activo" data-tab="identidad">
+        <div class="fila">
+          <div class="campo"><label>Nombre</label><input id="pj-nombre"></div>
+          <div class="campo"><label>Apellidos</label><input id="pj-apellidos"></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Apodo / alias</label><input id="pj-apodo"></div>
+          <div class="campo"><label>Edad</label><input id="pj-edad" placeholder="ej. 27 o Desconocida"></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Fecha de nacimiento</label><input id="pj-fecha-nac" placeholder="ej. 14 de marzo"></div>
+          <div class="campo"><label>Género / identidad</label><input id="pj-genero" placeholder="Ej: Mujer, No binario, Fluido…"></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Rol / arquetipo narrativo</label><input id="pj-rol" placeholder="Ej: Héroe, Mentor, Antagonista…"></div>
+          <div class="campo"><label>Raza / especie</label><input id="pj-raza" list="lista-razas" placeholder="Ej: Elfo, Humano…"></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Ocupación / profesión</label><input id="pj-ocupacion"></div>
+          <div class="campo"><label>Estatus social</label><input id="pj-estatus" placeholder="Ej: Noble, Marginado, Clase media…"></div>
+        </div>
+        <div class="campo"><label>Facción / bando</label><input id="pj-faccion" placeholder="Ej: La Resistencia, Casa Real, Sin bando…"></div>
+        <div class="campo"><label>Imagen</label><input type="file" id="pj-imagen" accept="image/*"><img class="imagen-preview" id="pj-imagen-preview" alt="Vista previa"></div>
+        <div class="campo"><label>Color del nodo (mapa)</label><div class="selector-color" id="pj-color"></div></div>
+      </div>
+
+      <div class="pj-panel" data-tab="personalidad">
+        <div class="campo"><label>Rasgos de personalidad (uno por línea)</label><textarea id="pj-rasgos" placeholder="Ej: Impulsivo&#10;Leal&#10;Sarcástico"></textarea></div>
+        <div class="fila">
+          <div class="campo"><label>Virtudes (una por línea)</label><textarea id="pj-virtudes"></textarea></div>
+          <div class="campo"><label>Defectos generales (uno por línea)</label><textarea id="pj-defectos"></textarea></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Miedos / fobias (uno por línea)</label><textarea id="pj-miedos"></textarea></div>
+          <div class="campo"><label>Manías / hábitos (uno por línea)</label><textarea id="pj-manias"></textarea></div>
+        </div>
+      </div>
+
+      <div class="pj-panel" data-tab="nucleo">
+        <div class="campo"><label>Deseo externo (Want) — la meta tangible que cree que quiere</label><textarea id="pj-deseo" placeholder="Ej: Ganar el torneo para probar su valía"></textarea></div>
+        <div class="campo"><label>Necesidad interna (Need) — lo que de verdad necesita aprender</label><textarea id="pj-necesidad" placeholder="Ej: Aprender a perdonarse a sí mismo"></textarea></div>
+        <div class="campo"><label>La Mentira — creencia errónea sobre sí mismo o el mundo</label><textarea id="pj-mentira" placeholder="Ej: Cree que solo vale por lo que logra, no por quién es"></textarea></div>
+        <div class="campo"><label>La Herida / el Fantasma — el trauma que originó la Mentira</label><textarea id="pj-herida" placeholder="El momento del pasado que lo marcó"></textarea></div>
+        <div class="fila">
+          <div class="campo"><label>Defecto trágico (el rasgo que más lo frena)</label><input id="pj-defecto-tragico" placeholder="Ej: Orgullo, cob
