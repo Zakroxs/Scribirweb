@@ -582,3 +582,4 @@ html.movil #modal-ajustes .modal{height:calc(var(--vh100)*.94);}
 .apar-celda{flex:0 0 9px;height:20px;border-radius:2px;background:var(--bg-activo);display:block;}
 .apar-celda.on{background:var(--acento-tinta);cursor:pointer;}
 html.movil .apar-celda{flex-basis:12px;height:26px;}
+html.i18n-pendiente body{visibility:hidden;}
